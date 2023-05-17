@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block title %}FaceDroop{% endblock %} {% set active_page = "face" %} {% block content %}
+<h1>Face Droop Detection</h1>
+<video id="video" autoplay></video>
+<br>
+<button onclick="capture()">Capture</button>
+<br>
+<h2 id="result"></h2>
+<a href="/q" type="button">Continue</a>
+<!-- <button id="next-button">Next</button>
+    <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+
+
+
+<script>
+    // Access the camera and display video stream
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+            var video = document.getElementById('video');
+            video.srcObject = stream;
+        })
+        .catch(function (error) {
+            console.log("Error accessing camera: " + error);
+        });
+
+    // Capture image from video stream and send it to the server for processing
+    function capture() {
+        var video = document.getElementById('video');
+        var canvas = document.createElement('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        canvas.toBlob(function (blob) {
+            var formData = new FormData();
+            formData.append('image', blob, 'image.jpg');
+
+            fetch('/detect', { method: 'POST', body: formData })
+                .then(function (response) {
+                    return response.text();
+                })
+                .then(function (result) {
+                    var resultElement = document.getElementById('result');
+                    resultElement.textContent = result;
+                })
+                .catch(function (error) {
+                    console.log("Error detecting face droop: " + error);
+                });
+        }, 'image/jpeg');
+    }
+
+
+</script>
+{% block footer %} {% endblock %} {% endblock %}
