@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import dlib
 from unicodedata import name
 from sqlalchemy import nullslast
 from flask_login import UserMixin
@@ -114,7 +114,6 @@ def q():
     return render_template("q.html",user=current_user)
 
 
-
 @app.route('/detect', methods=['POST'])
 def detect():
     # Get the captured image from the POST request
@@ -129,30 +128,37 @@ def detect():
     # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Load the face cascade classifier
-    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    # Load the face detector and facial landmarks predictor
+    face_detector = dlib.get_frontal_face_detector()
+    landmark_predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
     # Detect faces in the grayscale image
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    faces = face_detector(gray)
 
     # Perform face droop detection
     result = "Face droop not detected"
-    global result_binary
     result_binary=0
 
-    for (x, y, w, h) in faces:
-        nose_point = (x + int(w/2), y + int(h/2))
-        chin_point = (x + int(w/2), y + h)
+    if len(faces) > 0:
+        face = faces[0]
+        landmarks = landmark_predictor(gray, face)
 
-        # Calculate the distance between the nose and chin points
-        distance = abs(chin_point[1] - nose_point[1])
+        # Get the coordinates of the landmarks
+        upper_lip_center = (landmarks.part(51).x + landmarks.part(62).x) // 2, (landmarks.part(51).y + landmarks.part(62).y) // 2
+        lower_lip_center = (landmarks.part(57).x + landmarks.part(66).x) // 2, (landmarks.part(57).y + landmarks.part(66).y) // 2
+        nose_tip = (landmarks.part(30).x, landmarks.part(30).y)
+        chin = (landmarks.part(8).x, landmarks.part(8).y)
 
-        # Determine if the face is drooping based on the distance and threshold
-        threshold = 0.6  # Adjust this value as needed
-        if distance >= threshold * h:
+        # Calculate the lip line and compare it with the nose-to-chin line
+        lip_line = lower_lip_center[1] - upper_lip_center[1]
+        nose_chin_line = chin[1] - nose_tip[1]
+        
+        droop_threshold = 0.17  # Adjust this value based on your requirements
+        droop_ratio = lip_line / nose_chin_line
+        print(droop_ratio)
+        if droop_ratio > droop_threshold:
             result = "Face droop detected"
             result_binary=1
-            break
 
     return result
 
