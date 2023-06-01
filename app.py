@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-
+import dlib
 from unicodedata import name
 from sqlalchemy import nullslast
 from flask_login import UserMixin
@@ -87,36 +87,66 @@ option2=""
 option3=""
 option4=""
 option5=""
-risk=0
+totrisk=0.0
 result_binary=0
 # app = Blueprint("app", __name__)
 # UPLOAD_FOLDER = 'static/uploads/'
 #flask.current_app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 @app.route("/")
+@app.route("/home")
+@login_required
+def home():
+    return render_template("home.html", user=current_user)
+
+@app.route("/about")
+@login_required
+def about():
+    return render_template("about.html", user=current_user)
+
+@app.route("/blog")
+@login_required
+def blog():
+    return render_template("blog.html", user=current_user)
+
+@app.route("/doctors")
+@login_required
+def doctors():
+    return render_template("doctors.html", user=current_user)
+
+@app.route("/blog_details")
+@login_required
+def blog_details():
+    return render_template("blog_details.html", user=current_user)
+
 @app.route("/face")
 @login_required
 def face():
     return render_template("index.html",user=current_user)
 
-@app.route("/home")
-@login_required
-def home():
-    posts = Post.query.order_by(Post.date_created.desc()).all()
-    # posts = Post.query.all()
-    return render_template("home.html", user=current_user, posts=posts)
 
 
 @app.route("/q")
 @login_required
 def q():
-    questions = ["Are you having headache?","Balance: Are you leaning to one side or staggering when walking?","Eyes:Is there a sudden loss of vision in one or both eyes?","Arms:Raise your both arms. Does one arm drift downward?"]
+    global age
+    global option2
+    global option3
+    global option4
+    global option5
+    global totrisk
+    age=""
+    option2=""
+    option3=""
+    option4=""
+    option5=""
+    totrisk=0.0
     return render_template("q.html",user=current_user)
-
 
 
 @app.route('/detect', methods=['POST'])
 def detect():
+    global result_binary
     # Get the captured image from the POST request
     img_data = request.files['image'].read()
 
@@ -129,30 +159,37 @@ def detect():
     # Convert the image to grayscale
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    # Load the face cascade classifier
-    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
+    # Load the face detector and facial landmarks predictor
+    face_detector = dlib.get_frontal_face_detector()
+    landmark_predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
 
     # Detect faces in the grayscale image
-    faces = face_cascade.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
+    faces = face_detector(gray)
 
     # Perform face droop detection
     result = "Face droop not detected"
-    global result_binary
     result_binary=0
 
-    for (x, y, w, h) in faces:
-        nose_point = (x + int(w/2), y + int(h/2))
-        chin_point = (x + int(w/2), y + h)
+    if len(faces) > 0:
+        face = faces[0]
+        landmarks = landmark_predictor(gray, face)
 
-        # Calculate the distance between the nose and chin points
-        distance = abs(chin_point[1] - nose_point[1])
+        # Get the coordinates of the landmarks
+        upper_lip_center = (landmarks.part(51).x + landmarks.part(62).x) // 2, (landmarks.part(51).y + landmarks.part(62).y) // 2
+        lower_lip_center = (landmarks.part(57).x + landmarks.part(66).x) // 2, (landmarks.part(57).y + landmarks.part(66).y) // 2
+        nose_tip = (landmarks.part(30).x, landmarks.part(30).y)
+        chin = (landmarks.part(8).x, landmarks.part(8).y)
 
-        # Determine if the face is drooping based on the distance and threshold
-        threshold = 0.6  # Adjust this value as needed
-        if distance >= threshold * h:
+        # Calculate the lip line and compare it with the nose-to-chin line
+        lip_line = lower_lip_center[1] - upper_lip_center[1]
+        nose_chin_line = chin[1] - nose_tip[1]
+        
+        droop_threshold = 0.145  # Adjust this value based on your requirements
+        droop_ratio = lip_line / nose_chin_line
+        print(droop_ratio)
+        if droop_ratio > droop_threshold:
             result = "Face droop detected"
             result_binary=1
-            break
 
     return result
 
@@ -162,7 +199,7 @@ def detect():
 def q1():
     # if request.method == "POST":
     #    global age
-    #    global risk
+    #    global totrisk
     #    age1 = request.form.get("age")
     #    age = age1
        
@@ -174,7 +211,7 @@ def q1():
 def q2():
     if request.method == 'POST':       
         global age
-        global risk
+        global totrisk
         age1 = request.form.get("age")
         age = age1
         # if age>40:
@@ -185,7 +222,7 @@ def q2():
 @login_required
 def q3():
     global option2
-    global risk
+    global totrisk
     option2 = request.form.get('headache')
     # if option2=="yes":
     #     risk=risk+0.2
@@ -195,7 +232,7 @@ def q3():
 @login_required
 def q4():
     global option3
-    global risk
+    global totrisk
     option3 = request.form.get('balance')
     # if option3=="yes":
     #     risk=risk+0.2
@@ -205,7 +242,7 @@ def q4():
 @login_required
 def q5():
     global option4
-    global risk
+    global totrisk
     option4 = request.form.get('eye')
     return render_template("q5.html",user=current_user)
 
@@ -217,19 +254,29 @@ def risk():
     global option3
     global option4
     global option5
-    global risk
+    global totrisk
+    finalqna=0
+    total_risk=0.0
+    
     option5 = request.form.get('arms')
     if int(age)>40:
-           risk = 0.2
+           totrisk = 0.2
     if option2=="yes":
-        risk+=0.2
+        totrisk= totrisk + 0.2
     if option3=="yes":
-        risk+=0.2
+        totrisk= totrisk + 0.2
     if option4=="yes":
-        risk+=0.2
+        totrisk= totrisk + 0.2
     if option5=="yes":
-        risk+=0.2
-    return render_template("risk.html",user=current_user,risk=round(risk,2), face_risk=result_binary)
+        totrisk= totrisk + 0.2
+        
+    if(totrisk>=0.4):
+        finalqna=1
+    print(result_binary)
+    print(finalqna)
+    total_risk = ( finalqna + result_binary )/2
+    
+    return render_template("risk.html",user=current_user,risk=(total_risk*100))
 
 
 @app.route("/qna")
@@ -305,7 +352,7 @@ def login():
             if check_password_hash(user.password, password):
                 # flash("Logged in!", category='success')
                 login_user(user, remember=True)
-                return redirect(url_for('q'))
+                return redirect(url_for('home'))
             else:
                 flash('Password is incorrect.', category='error')
         else:

@@ -26,11 +26,10 @@
                     <h1 style="text-align: center;">RISK</h1>
                     <div style=" text-align: center;">
                         <!-- <img style="width: 500px;" src="../static/riskk.jpg"> -->
-                        <p style="font-size: 50px;">The total risk is {{risk}}</p>
+                        <p style="font-size: 50px;">{{risk}}%</p>
                     </div>
                     <div style=" text-align: center;">
                         <!-- <img style="width: 500px;" src="../static/riskk.jpg"> -->
-                        <p style="font-size: 50px;">facedroop risk is {{face_risk}}</p>
                     </div>
                 </div>
                 <form action="{{ url_for('risk')}}" method="post">
@@ -40,11 +39,16 @@
           ">
 
                     </div>
-                    <div style="width: 100% ;display: flex; justify-content: right;">
-                        <!-- <a class="btn btn-primary" href="/q2" role="button"
-                            style="width: 150px; margin-top: 5px; ;">Continue</a> -->
-                    </div>
 
+                    
+                {% if risk >=50.0 %}
+                    <div style="width: 100% ;display: flex; justify-content: right;">
+                        <a class="btn btn-primary" href="/doctors" role="button"
+                            style="width: 150px; margin-top: 5px; ;">Consultation</a>
+                    </div>
+                {% else %}
+                    No Consultation required! Be safe and healthy..
+                {% endif %}
                 </form>
             </div>
         </div>

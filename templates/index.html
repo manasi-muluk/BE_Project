@@ -1,17 +1,41 @@
 {% extends "base.html" %} {% block title %}FaceDroop{% endblock %} {% set active_page = "face" %} {% block content %}
-<h1>Face Droop Detection</h1>
-<video id="video" autoplay></video>
-<br>
-<button onclick="capture()">Capture</button>
-<br>
-<h2 id="result"></h2>
-<a href="/q" type="button">Continue</a>
-<!-- <button id="next-button">Next</button>
+<div style="text-align: center;
+margin-top: 30px;
+margin-bottom: 30px;">
+    <video style="border: 5px solid black;" id="video" autoplay></video>
+    <br>
+    <button style="width: 100px;
+    height: 41px;
+    border-radius: 17px;
+    background-color: #00D9A5;
+    color: white;
+    border: none;" onclick="capture()">Capture</button>
+    <br>
+    <div style="text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;">
+        <div id="box" style="width: 650px;
+        margin-top: 8px;
+        background-color: #00d9a540;
+        border-radius: 15px;
+        padding: 5px;display: none;">
+            <h2 id="result"></h2>
+        </div>
+        <!-- <button id="next-button">Next</button>
     <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+        <div id="next" style="display: none;">
+            <a href="/q">Next</a>
+        </div>
+    </div>
 
-
-
+</div>
 <script>
+
+    next = document.getElementById("next");
+
+
+
     // Access the camera and display video stream
     navigator.mediaDevices.getUserMedia({ video: true })
         .then(function (stream) {
@@ -41,6 +65,8 @@
                 .then(function (result) {
                     var resultElement = document.getElementById('result');
                     resultElement.textContent = result;
+                    next.style.display = "block";
+                    box.style.display = "block";
                 })
                 .catch(function (error) {
                     console.log("Error detecting face droop: " + error);
@@ -49,5 +75,8 @@
     }
 
 
+
+
 </script>
+
 {% block footer %} {% endblock %} {% endblock %}
