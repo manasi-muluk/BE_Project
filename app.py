@@ -180,14 +180,12 @@ def detect():
         nose_tip = (landmarks.part(30).x, landmarks.part(30).y)
         chin = (landmarks.part(8).x, landmarks.part(8).y)
 
-        # Calculate the lip line and compare it with the nose-to-chin line
-        lip_line = lower_lip_center[1] - upper_lip_center[1]
-        nose_chin_line = chin[1] - nose_tip[1]
-        
-        droop_threshold = 0.145  # Adjust this value based on your requirements
-        droop_ratio = lip_line / nose_chin_line
-        print(droop_ratio)
-        if droop_ratio > droop_threshold:
+        # Calculate the distance between the nose and chin points
+        distance = abs(chin_point[1] - nose_point[1])
+
+        # Determine if the face is drooping based on the distance and threshold
+        threshold = 0.6  # Adjust this value as needed
+        if distance >= threshold * h:
             result = "Face droop detected"
             result_binary=1
 
