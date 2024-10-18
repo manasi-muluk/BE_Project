@@ -1,38 +1,41 @@
-Here’s a summary of your efforts to manage risks and strengthen controls:
+Here's a revised summary that incorporates your responsiveness to feedback from your line manager during 1:1 meetings:
 
 
 ---
 
-Summary Comments on Managing Risks and Strengthening Controls
+Summary Comments on Values and Mindset Demonstrated Through LEAD Behaviors
 
-Throughout the review period, I have implemented several measures to effectively manage risks and enhance controls within our operations:
+Throughout this review period, I have embodied the LEAD behaviors that reflect our core values, contributing to a positive and productive team environment:
 
-1. Security Group Requests: I meticulously raised only the necessary security group requests, ensuring that permissions granted were strictly required for my work. This proactive approach minimizes potential security vulnerabilities and maintains a controlled access environment.
-
-
-2. Adherence to Bug Resolution SLAs: By resolving minor bugs within 2-3 hours and major bugs within 24 hours, I ensured prompt action on issues, reducing the risk of operational disruptions and maintaining product stability.
+1. Listen: I actively listened to my colleagues during team discussions and Knowledge Transfer (KT) sessions, ensuring that everyone’s insights and concerns were acknowledged. I also valued the feedback from my line manager during our 1:1 meetings, using it as a basis for personal and professional growth.
 
 
-3. Comprehensive Unit Test Coverage: Achieving 100% test case coverage for UI components I developed significantly strengthens our quality control measures. This proactive testing helps identify issues early, mitigating risks associated with potential bugs in production.
+2. Engage: I engaged with team members by facilitating knowledge sharing through detailed Confluence documentation and conducting training sessions. By creating resources that assist new joiners and promote best practices, I helped strengthen our collective knowledge base and encouraged a collaborative atmosphere.
 
 
-4. Root Cause Analysis for Problem Records: In addressing Problem Record PRB1000127248, I conducted thorough root cause analyses to identify and resolve issues at their source, preventing recurrence and strengthening our overall problem management processes.
+3. Adapt: I demonstrated adaptability by embracing new challenges, such as delving into the EPS backend to understand data exchange formats and contributing to both UI and backend development. This flexibility allowed me to better support team objectives and navigate evolving project requirements.
 
 
-5. Acceptance Suite Implementation: I established an acceptance suite for all user journeys I worked on, ensuring thorough end-to-end testing. This reduces the risk of missing critical issues before deployment, enhancing the reliability of our releases.
+4. Deliver: My focus on timely and high-quality outcomes was evident in my commitment to achieving 100% test coverage and adhering to bug resolution SLAs. By consistently delivering results that meet or exceed expectations, I contributed to the overall success of our projects.
 
 
-6. Continuous Monitoring and Documentation: I regularly updated JIRA with the status of tasks and issues, maintaining transparency and facilitating timely interventions. Additionally, I authored a Confluence page to guide team members in troubleshooting local UI setup errors, reinforcing knowledge sharing and risk management.
+5. Champion Diversity of Thought: I participated in the Big Tech Challenge, which allowed me to learn from diverse perspectives within the tech community. This experience reinforced my belief in the value of different viewpoints and innovative solutions.
 
 
-7. Training and Compliance: Completing all mandatory training ahead of time demonstrates my commitment to adhering to company policies and standards, which reinforces our compliance controls and risk management framework.
+6. Proactive Problem-Solving: I actively sought help from senior developers and Tech Leads when faced with challenges that could not be resolved quickly, demonstrating a mindset of collaboration and continuous improvement to ensure project progress.
+
+
+7. Commitment to Continuous Learning: By completing courses in React and Java 17, I embraced the value of continuous learning, enhancing my skills to better serve my team and contribute to our goals.
+
+
+8. Responsive to Feedback: I have taken the comments and suggestions from my line manager during our 1:1 meetings to heart, actively working on areas for improvement and integrating that feedback into my daily practices.
 
 
 
-Through these initiatives, I have actively contributed to a culture of risk awareness and control enhancement, ensuring our operations remain reliable and secure.
+Through these actions, I have exemplified the LEAD behaviors, promoting a values-driven culture within our team and aligning with our organizational objectives. I am committed to continuing this mindset as we strive for excellence together.
 
 
 ---
 
-Feel free to adjust any part to better reflect your experiences!
+Feel free to adjust any sections as needed!
 
