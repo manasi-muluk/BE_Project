@@ -1,18 +1,43 @@
-Here’s a concise version of your closing comments:
+import React from 'react';
+import { render, screen, cleanup } from '@testing-library/react';
+import BereavementForm from './BereavementForm';
 
+describe('BereavementForm Tests', () => {
+  afterEach(() => {
+    cleanup(); // Clean up after each test
+  });
 
----
+  it('should render component correctly', () => {
+    const props = {
+      api: {
+        data: {
+          fatalError: false,
+          messages: [],
+          referenceData: {
+            defaultCountries: [
+              { code: 'GB', decode: 'United Kingdom', localCode: null, decodeClass: null },
+              { code: 'OTH', decode: 'Other', localCode: null, decodeClass: null },
+            ],
+          },
+        },
+      },
+      message: jest.fn(),
+    };
 
-Closing Comments on Overall Performance and Development Opportunities
+    // Render the component
+    const { container } = render(<BereavementForm api={props.api} message={props.message} {...props} />);
 
-Over the past year, I have demonstrated a strong commitment to delivering high-quality outcomes and fostering collaboration within the team. Key achievements include achieving 100% test case coverage, successfully deploying over 20 UI builds, and actively contributing to knowledge sharing through documentation and training.
+    // Assert the component matches the snapshot
+    expect(container).toMatchSnapshot();
 
-Looking ahead, I see opportunities to deepen my technical expertise in backend development, enhance my leadership skills by mentoring others, and identify further automation to streamline our processes. I will continue to seek feedback for ongoing improvement and adapt to the team's evolving needs.
+    // Assert that Routes render correctly
+    const routes = screen.getAllByRole('route'); // Replace 'route' with a specific role or test ID
+    expect(routes).toHaveLength(14); // Assuming 14 routes as per the Enzyme test
 
-I am proud of my contributions this year and am eager to further enhance our team's success in the upcoming year.
-
-
----
-
-Feel free to adjust any phrases as needed!
-
+    // Optional: Add specific assertions to ensure routes render correctly
+    routes.forEach((route, index) => {
+      expect(route).toBeInTheDocument();
+      expect(route).toHaveAttribute('data-testid', `route-${index}`); // Adjust as per your code
+    });
+  });
+});
