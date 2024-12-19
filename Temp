@@ -1,82 +1,65 @@
-// EnhancedConversionLogic.js
-
 export function convertEnzymeToRTL(enzymeCode) {
   let rtlCode = enzymeCode;
 
-  // 1. Replace Enzyme imports
-  rtlCode = rtlCode.replace(
-    /import.*enzyme.*;/g,
-    "import { render, screen, fireEvent } from '@testing-library/react';"
-  );
+  // 1. Remove Enzyme imports
+  rtlCode = rtlCode.replace(/import.*enzyme.*;/g, "");
 
-  // 2. Replace `mount` with `render`
+  // 2. Remove the Enzyme adapter setup
+  rtlCode = rtlCode.replace(/Enzyme\.configure\{.*?};/gs, "");
+
+  // 3. Replace `mount` with `render`
   rtlCode = rtlCode.replace(/Enzyme\.mount/g, "render");
 
-  // 3. Replace `.simulate('click')` with `fireEvent.click`
+  // 4. Replace `shallow` (if used) with `render`
+  rtlCode = rtlCode.replace(/Enzyme\.shallow/g, "render");
+
+  // 5. Replace `.simulate('click')` with `fireEvent.click`
   rtlCode = rtlCode.replace(/\.simulate'click'/g, "fireEvent.click");
 
-  // 4. Replace `.simulate('change', { target: { value: '...' } })` with `fireEvent.change`
+  // 6. Replace `.simulate('change', ...)` with `fireEvent.change`
   rtlCode = rtlCode.replace(
-    /\.simulate'change',\s*{.*?value:\s*'(.*?)'.*?}/g,
+    /\.simulate'change',\s*\{\s*target:\s*\{.*?value:\s*'(.*?)'.*?}\s*}/g,
     "fireEvent.change($1)"
   );
 
-  // 5. Replace `.simulate('blur', { target: { value: '...' } })` with `fireEvent.blur`
+  // 7. Replace `.simulate('blur', ...)` with `fireEvent.blur`
   rtlCode = rtlCode.replace(
-    /\.simulate'blur',\s*{.*?value:\s*'(.*?)'.*?}/g,
+    /\.simulate'blur',\s*\{\s*target:\s*\{.*?value:\s*'(.*?)'.*?}\s*}/g,
     "fireEvent.blur($1)"
   );
 
-  // 6. Replace `.simulate('keydown', { key: '...' })` with `fireEvent.keyDown`
-  rtlCode = rtlCode.replace(
-    /\.simulate'keydown',\s*{.*?key:\s*'(.*?)'.*?}/g,
-    "fireEvent.keyDown($1)"
-  );
+  // 8. Replace `.simulate('focus', ...)` with `fireEvent.focus`
+  rtlCode = rtlCode.replace(/\.simulate'focus'/g, "fireEvent.focus");
 
-  // 7. Replace `.simulate('keyup', { key: '...' })` with `fireEvent.keyUp`
-  rtlCode = rtlCode.replace(
-    /\.simulate'keyup',\s*{.*?key:\s*'(.*?)'.*?}/g,
-    "fireEvent.keyUp($1)"
-  );
+  // 9. Replace `.exists()` with `toBeInTheDocument`
+  rtlCode = rtlCode.replace(/\.exists/g, "toBeInTheDocument()");
 
-  // 8. Replace `.props()` with `screen.getByTestId(...).textContent` or other prop validation
+  // 10. Replace `.props()` with manual assertions (commented for manual review)
   rtlCode = rtlCode.replace(
     /\.props/g,
-    "// Convert manually: Use `screen.getByTestId(...).textContent` or appropriate RTL query"
+    "// Replace manually: Use RTL queries like screen.getByTestId"
   );
 
-  // 9. Replace `.find()` with `screen.getByTestId` (manual for complex cases)
-  rtlCode = rtlCode.replace(
-    /component\.find(.*?)/g,
-    "screen.getByTestId($1)"
-  );
-
-  // 10. Replace `.exists()` with RTL queries
-  rtlCode = rtlCode.replace(/\.exists/g, "expect(screen.queryByTestId(...)).toBeInTheDocument()");
-
-  // 11. Replace `.text()` with `.textContent` from DOM node
-  rtlCode = rtlCode.replace(
-    /\.text/g,
-    "// Convert manually: Use `.textContent` or appropriate text queries"
-  );
+  // 11. Replace `.find()` with `screen.getByTestId`
+  rtlCode = rtlCode.replace(/component\.find(.*?)/g, "screen.getByTestId($1)");
 
   // 12. Replace `.at(index)` with `[index]`
   rtlCode = rtlCode.replace(/\.at(\d+)/g, "[$1]");
 
-  // 13. Replace `.setProps()` with `rerender` function in RTL
+  // 13. Replace `.setProps()` with comments to use `rerender` (manual intervention)
   rtlCode = rtlCode.replace(
     /\.setProps(.*?)/g,
-    "// Convert manually: Use `rerender` in RTL"
+    "// Replace manually: Use `rerender` for updated props"
   );
 
-  // 14. Replace `.simulate('mousedown')` with `fireEvent.mouseDown`
-  rtlCode = rtlCode.replace(/\.simulate'mousedown'/g, "fireEvent.mouseDown");
+  // 14. Replace `.text()` with `.textContent`
+  rtlCode = rtlCode.replace(
+    /\.text/g,
+    "// Replace manually: Use `.textContent` or `screen.getByText`"
+  );
 
-  // 15. Replace `.simulate('focus')` with `fireEvent.focus`
-  rtlCode = rtlCode.replace(/\.simulate'focus'/g, "fireEvent.focus");
-
-  // 16. Replace `.contains()` with `.toContainElement()`
-  rtlCode = rtlCode.replace(/\.contains(.*?)/g, "expect(screen.getByTestId(...)).toContainElement($1)");
+  // 15. Remove leftover Enzyme mentions
+  rtlCode = rtlCode.replace(/Enzyme/g, "");
 
   return rtlCode;
 }
