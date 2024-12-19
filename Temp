@@ -1,43 +1,111 @@
-import React from 'react';
-import { render, screen, cleanup } from '@testing-library/react';
-import BereavementForm from './BereavementForm';
+// ConversionLogic.js
 
-describe('BereavementForm Tests', () => {
-  afterEach(() => {
-    cleanup(); // Clean up after each test
-  });
+export function convertEnzymeToRTL(enzymeCode) {
+  let rtlCode = enzymeCode;
 
-  it('should render component correctly', () => {
-    const props = {
-      api: {
-        data: {
-          fatalError: false,
-          messages: [],
-          referenceData: {
-            defaultCountries: [
-              { code: 'GB', decode: 'United Kingdom', localCode: null, decodeClass: null },
-              { code: 'OTH', decode: 'Other', localCode: null, decodeClass: null },
-            ],
-          },
-        },
-      },
-      message: jest.fn(),
-    };
+  // Replace Enzyme imports
+  rtlCode = rtlCode.replace(/import.*enzyme.*;/g, "import { render, screen, fireEvent } from '@testing-library/react';");
 
-    // Render the component
-    const { container } = render(<BereavementForm api={props.api} message={props.message} {...props} />);
+  // Replace `mount` with `render`
+  rtlCode = rtlCode.replace(/Enzyme\.mount/g, "render");
 
-    // Assert the component matches the snapshot
-    expect(container).toMatchSnapshot();
+  // Replace `.simulate('click')` with `fireEvent.click`
+  rtlCode = rtlCode.replace(/\.simulate'click'/g, "fireEvent.click");
 
-    // Assert that Routes render correctly
-    const routes = screen.getAllByRole('route'); // Replace 'route' with a specific role or test ID
-    expect(routes).toHaveLength(14); // Assuming 14 routes as per the Enzyme test
+  // Replace `.simulate('change', { target: { value: '...' } })` with `fireEvent.change`
+  rtlCode = rtlCode.replace(/\.simulate'change',\s*{.*?value:\s*'(.*?)'.*?}/g, "fireEvent.change($1)");
 
-    // Optional: Add specific assertions to ensure routes render correctly
-    routes.forEach((route, index) => {
-      expect(route).toBeInTheDocument();
-      expect(route).toHaveAttribute('data-testid', `route-${index}`); // Adjust as per your code
-    });
-  });
-});
+  // Replace `.find()` with `screen.getBy...` (manual step for now)
+  rtlCode = rtlCode.replace(/component\.find(.*?)/g, "screen.getByTestId($1)");
+
+  return rtlCode;
+}
+
+import React, { useState } from "react";
+
+function FileInput({ onConvert }) {
+  const [fileContent, setFileContent] = useState("");
+
+  const handleInputChange = (e) => setFileContent(e.target.value);
+
+  const handleConvert = () => onConvert(fileContent);
+
+  return (
+    <div>
+      <h2>Paste Enzyme Test Code</h2>
+      <textarea
+        rows="20"
+        cols="100"
+        value={fileContent}
+        onChange={handleInputChange}
+        placeholder="Paste your Enzyme test code here..."
+      />
+      <br />
+      <button onClick={handleConvert}>Convert to RTL</button>
+    </div>
+  );
+}
+
+export default FileInput;
+
+import React from "react";
+
+function ConvertedOutput({ convertedCode }) {
+  return (
+    <div>
+      <h2>Converted RTL Test Code</h2>
+      <pre style={{ background: "#f4f4f4", padding: "10px", borderRadius: "5px" }}>
+        {convertedCode}
+      </pre>
+    </div>
+  );
+}
+
+export default ConvertedOutput;
+import React, { useState } from "react";
+import FileInput from "./components/FileInput";
+import ConvertedOutput from "./components/ConvertedOutput";
+import { convertEnzymeToRTL } from "./components/ConversionLogic";
+
+function App() {
+  const [convertedCode, setConvertedCode] = useState("");
+
+  const handleConvert = (enzymeCode) => {
+    const rtlCode = convertEnzymeToRTL(enzymeCode);
+    setConvertedCode(rtlCode);
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>Enzyme to React Testing Library Converter</h1>
+      <FileInput onConvert={handleConvert} />
+      {convertedCode && <ConvertedOutput convertedCode={convertedCode} />}
+    </div>
+  );
+}
+
+export default App;
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+textarea {
+  width: 100%;
+  margin-bottom: 10px;
+  font-family: monospace;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
