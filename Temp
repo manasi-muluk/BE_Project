@@ -1,11 +1,1 @@
-let rtlCode = `
-  expect(component.find(Continue_btn_id).at(0).simulate('click')).toBeTruthy();
-  expect(component.find(AnotherButton).at(0).simulate('click')).toBeTruthy();
-`;
-
-rtlCode = rtlCode.replace(
-  /expect \(component\.find\((.*?)\)\.at\(0\)\.simulate\('click'\)\)\.toBeTruthy\(\);/g,
-  "const nextButton = screen.getByRole('button', { name: /Next/i });\nfireEvent.click(nextButton);"
-);
-
-console.log(rtlCode);
+/expect \(component\.find\((.*?)\)\[0\]\.simulate\((.*?)\)\)\.toBeTruthy\(\);/g
