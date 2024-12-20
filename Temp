@@ -70,5 +70,11 @@ export function convertEnzymeToRTL(enzymeCode) {
   // 17. Handle other direct RTL syntax like `screen.getByText`, `fireEvent`, etc.
   rtlCode = rtlCode.replace(/component\.find\((.*?)\)/g, "screen.getByTestId($1)");
 
+  // 18. Replace `simulate('blur')` with `fireEvent.blur(screen.getByTestId(...))`
+  rtlCode = rtlCode.replace(/\.simulate\('blur',\s*\{\s*target:\s*\{.*?value:\s*'(.*?)'.*?\}\s*\}\)/g, "fireEvent.blur(screen.getByTestId('$1'))");
+
+  // 19. Replace `component.find(EMAIL_ADDRESS_ID).hostNodes()` with `screen.getByTestId(EMAIL_ADDRESS_ID)`
+  rtlCode = rtlCode.replace(/component\.find\((.*?)\)\.hostNodes\(\)/g, "screen.getByTestId('$1')");
+
   return rtlCode;
 }
