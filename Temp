@@ -1,4 +1,4 @@
 rtlCode = rtlCode.replace(
     /Component\.find\((.*?)\)\.at\(0\)\.simulate\('click'\)/g,
-    "const nextButton = screen.getByTestId('$1');\nfireEvent.click(nextButton);"
+    "const nextButton = screen.getByRole('button', { name: /Next/i });\nfireEvent.click(nextButton);"
   );
