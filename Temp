@@ -1,16 +1,22 @@
 export function convertEnzymeToRTL(enzymeCode) {
   let rtlCode = enzymeCode;
 
-  // Match all instances of `const component = render(...)`
+  // Match entire test case blocks
   rtlCode = rtlCode.replace(
-    /(it\([^)]*{[\s\S]*?)(const\s+component\s*=\s*render\([\s\S]*?\);)/g,
-    (match, testStart, componentAssignment) => {
-      // Check if the test body contains the word "snapshot"
-      if (/snapshot/i.test(match)) {
-        return match; // Keep the component assignment
+    /(it\([^)]*\{)([\s\S]*?)(\}\);)/g,
+    (match, testStart, testBody, testEnd) => {
+      // Check if "snapshot" exists in the test body
+      if (/snapshot/i.test(testBody)) {
+        // Retain the test case as-is if "snapshot" is present
+        return match;
       }
-      // Otherwise, remove the component assignment
-      return testStart;
+
+      // If no snapshot, remove only "const component = " from the render call
+      const updatedBody = testBody.replace(
+        /const\s+component\s*=\s*/g,
+        ""
+      );
+      return `${testStart}${updatedBody}${testEnd}`;
     }
   );
 
