@@ -1,13 +1,12 @@
 // Sample file content stored in the variable `temp`
 let temp = `
-  emailField.simulate('blur', emailSpecialChar);
-  username.simulate('blur', usernameInput);
-  anotherField.simulate('blur', anotherValue);
+  emailField.simulate('blur', {target: { value: '$#%$@^$&%*' } });
+  username.simulate('blur', {target: { value: 'testValue' } });
 `;
 
-// Logic to find and replace the pattern in the `temp` variable
+// Logic to find and replace the new pattern in the `temp` variable
 temp = temp.replace(
-  /(\w+)\.simulate\('blur',\s*(\w+)\);/g,
+  /(\w+)\.simulate\('blur',\s*(\{.*?\})\);/g,
   'fireEvent.blur($1, $2);'
 );
 
