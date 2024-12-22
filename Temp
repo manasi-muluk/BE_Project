@@ -1,13 +1,13 @@
 // Sample file content stored in the variable `temp`
 let temp = `
-  emailField.simulate('blur', {target: { value: '$#%$@^$&%*' } });
-  username.simulate('blur', {target: { value: 'testValue' } });
+  component.find(NOTOFIER_PHONE_NO_BUTTON_ID).simulate('change', {target: {name: 'notifierPhone' , value: '1234123a'} });
+  component.find(USERNAME_BUTTON_ID).simulate('change', {target: {name: 'username' , value: 'testValue'} });
 `;
 
-// Logic to find and replace the new pattern in the `temp` variable
+// Logic to find and replace the pattern in the `temp` variable
 temp = temp.replace(
-  /(\w+)\.simulate\('blur',\s*(\{.*?\})\);/g,
-  'fireEvent.blur($1, $2);'
+  /component\.find\((\w+)\)\.simulate\('change',\s*(\{.*?\})\);/g,
+  'screen.getByTestId($1).simulate(\'change\', $2);'
 );
 
 // Output the updated content
