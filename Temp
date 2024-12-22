@@ -1,17 +1,8 @@
 rtlCode = rtlCode.replace(
-  /(it\([^)]*\)\s*=>\s*\{)([\s\S]*?)(\}\);)/g,
-  (match, testStart, testBody, testEnd) => {
-    console.log("Match found:", match); // Debugging log
-    // Check for "snapshot"
-    if (/snapshot/i.test(testBody)) {
-      return match; // Retain the original if "snapshot" is found
-    }
-
-    // Remove only "const component = " if "snapshot" is not found
-    const updatedBody = testBody.replace(
-      /const\s+component\s*=\s*/g,
-      ""
-    );
-    return `${testStart}${updatedBody}${testEnd}`;
+  /\.simulate\('blur',\s*(\{.*?target:\s*\{.*?value:\s*'(.*?)'.*?\}\}\)/g,
+  (match, blurData, value) => {
+    console.log("Match found:", match); // For debugging
+    // Return the transformed code
+    return `fireEvent.blur(emailField, { target: { value: '${value}' } })`;
   }
 );
