@@ -1,6 +1,15 @@
-rtlCode = rtlCode.replace(
-  /(\w+)\.simulate\('blur',\s*\{[^}]*target:\s*\{[^}]*value:\s*'(.*?)'.*?\}\}\)/g,
-  (match, fieldName, value) => {
-    return `fireEvent.blur(${fieldName}, { target: { value: '${value}' } })`;
-  }
+// Sample file content stored in the variable `temp`
+let temp = `
+  emailField.simulate('blur', emailSpecialChar);
+  username.simulate('blur', usernameInput);
+  anotherField.simulate('blur', anotherValue);
+`;
+
+// Logic to find and replace the pattern in the `temp` variable
+temp = temp.replace(
+  /(\w+)\.simulate\('blur',\s*(\w+)\);/g,
+  'fireEvent.blur($1, $2);'
 );
+
+// Output the updated content
+console.log(temp);
