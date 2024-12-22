@@ -1,4 +1,6 @@
 rtlCode = rtlCode.replace(
-  /\.simulate\('blur',\s*(\{[^}]*value:\s*'(.*?)'.*?\}\))/g,
-  "fireEvent.blur(emailField, { target: { value: '$2' } })"
+  /(\w+)\.simulate\('blur',\s*(\{[^}]*target:\s*\{[^}]*value:\s*'(.*?)'.*?\}\})\)/g,
+  (match, fieldName, blurArgs, value) => {
+    return `fireEvent.blur(${fieldName}, { target: { value: '${value}' } })`;
+  }
 );
