@@ -1,24 +1,41 @@
 export function convertEnzymeToRTL(enzymeCode) {
   let rtlCode = enzymeCode;
 
-  // Existing conversions...
+  // 1. Remove Enzyme imports
+  rtlCode = rtlCode.replace(/import.*enzyme.*;/g, "");
 
-  // Identify and handle cases with "snapshot"
+  // 2. Remove the Enzyme adapter setup
+  rtlCode = rtlCode.replace(/Enzyme\.configure\{.*?\};/gs, "");
+
+  // 3. Preserve `const component` if "snapshot" is present
   rtlCode = rtlCode.replace(
-    /const\s+component\s*=\s*render\([\s\S]*?\);/g,
-    (match) => {
-      // Check if "snapshot" is present in the test body
-      const testBody = rtlCode.slice(
-        rtlCode.indexOf(match),
-        rtlCode.indexOf('});', rtlCode.indexOf(match)) + 3
-      );
+    /it\((['"`]).*?\1,\s*\(\)\s*=>\s*\{([\s\S]*?)\}\);/g,
+    (match, quote, testBody) => {
       if (/snapshot/i.test(testBody)) {
-        return match; // Keep the component if snapshot is used
-      } else {
-        return ""; // Remove the component assignment if no snapshot is used
+        // Keep `const component` in tests with snapshots
+        return match;
       }
+      // Remove `const component` in other tests
+      return match.replace(/const\s+component\s*=\s*render\([\s\S]*?\);/g, "");
     }
   );
+
+  // 4. Replace Enzyme-specific import statements with RTL imports
+  rtlCode = rtlCode.replace(
+    /import\s+React.*;/g,
+    `import React from 'react';\nimport { render, screen, fireEvent } from '@testing-library/react';\nimport '@testing-library/jest-dom';`
+  );
+
+  // 5. Replace `mount` with `render`
+  rtlCode = rtlCode.replace(/Enzyme\.mount/g, "render");
+
+  // 6. Replace `shallow` with `render`
+  rtlCode = rtlCode.replace(/Enzyme\.shallow/g, "render");
+
+  // 7. Replace `.simulate('click')` with `fireEvent.click`
+  rtlCode = rtlCode.replace(/\.simulate\('click'\)/g, "fireEvent.click");
+
+  // Continue other transformations...
 
   return rtlCode;
 }
