@@ -1,24 +1,17 @@
-export function convertEnzymeToRTL(enzymeCode) {
-  let rtlCode = enzymeCode;
-
-  // Match entire test case blocks
-  rtlCode = rtlCode.replace(
-    /(it\([^)]*\{)([\s\S]*?)(\}\);)/g,
-    (match, testStart, testBody, testEnd) => {
-      // Check if "snapshot" exists in the test body
-      if (/snapshot/i.test(testBody)) {
-        // Retain the test case as-is if "snapshot" is present
-        return match;
-      }
-
-      // If no snapshot, remove only "const component = " from the render call
-      const updatedBody = testBody.replace(
-        /const\s+component\s*=\s*/g,
-        ""
-      );
-      return `${testStart}${updatedBody}${testEnd}`;
+rtlCode = rtlCode.replace(
+  /(it\([^)]*\)\s*=>\s*\{)([\s\S]*?)(\}\);)/g,
+  (match, testStart, testBody, testEnd) => {
+    console.log("Match found:", match); // Debugging log
+    // Check for "snapshot"
+    if (/snapshot/i.test(testBody)) {
+      return match; // Retain the original if "snapshot" is found
     }
-  );
 
-  return rtlCode;
-}
+    // Remove only "const component = " if "snapshot" is not found
+    const updatedBody = testBody.replace(
+      /const\s+component\s*=\s*/g,
+      ""
+    );
+    return `${testStart}${updatedBody}${testEnd}`;
+  }
+);
