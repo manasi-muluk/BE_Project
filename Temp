@@ -1,1 +1,24 @@
-/expect \(component\.find\((.*?)\)\[0\]\.simulate\((.*?)\)\)\.toBeTruthy\(\);/g
+export function convertEnzymeToRTL(enzymeCode) {
+  let rtlCode = enzymeCode;
+
+  // Existing conversions...
+
+  // Identify and handle cases with "snapshot"
+  rtlCode = rtlCode.replace(
+    /const\s+component\s*=\s*render\([\s\S]*?\);/g,
+    (match) => {
+      // Check if "snapshot" is present in the test body
+      const testBody = rtlCode.slice(
+        rtlCode.indexOf(match),
+        rtlCode.indexOf('});', rtlCode.indexOf(match)) + 3
+      );
+      if (/snapshot/i.test(testBody)) {
+        return match; // Keep the component if snapshot is used
+      } else {
+        return ""; // Remove the component assignment if no snapshot is used
+      }
+    }
+  );
+
+  return rtlCode;
+}
