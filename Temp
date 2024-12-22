@@ -1,12 +1,19 @@
 // Sample file content stored in the variable `temp`
 let temp = `
-  component.find(NOTOFIER_PHONE_NO_BUTTON_ID).simulate('change', {target: {name: 'notifierPhone' , value: '1234123a'} });
-  component.find(USERNAME_BUTTON_ID).simulate('change', {target: {name: 'username' , value: 'testValue'} });
+  component.find(NOTOFIER_PHONE_NO_BUTTON_ID).simulate('change', {
+    target: {name: 'notifierPhone' , 
+    value: '1234123a'}
+  });
+  
+  component.find(USERNAME_BUTTON_ID).simulate('change', {
+    target: {name: 'username' , 
+    value: 'testValue'}
+  });
 `;
 
 // Logic to find and replace the pattern in the `temp` variable
 temp = temp.replace(
-  /component\.find\((\w+)\)\.simulate\('change',\s*(\{.*?\})\);/g,
+  /component\.find\((\w+)\)\.simulate\('change',\s*([\s\S]*?)\);/g,
   'screen.getByTestId($1).simulate(\'change\', $2);'
 );
 
