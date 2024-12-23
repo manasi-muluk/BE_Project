@@ -1,20 +1,13 @@
 // Sample file content stored in the variable `temp`
 let temp = `
-  component.find(NOTOFIER_PHONE_NO_BUTTON_ID).simulate('change', {
-    target: {name: 'notifierPhone' , 
-    value: '1234123a'}
-  });
-  
-  component.find(USERNAME_BUTTON_ID).simulate('change', {
-    target: {name: 'username' , 
-    value: 'testValue'}
-  });
+  component.find('#accno').at(1).simulate('blur', {target:{value: '1111', name: TEXT.SOMETHING}});
+  component.find('#username').at(2).simulate('blur', {target:{value: 'testValue', name: TEXT.OTHER}});
 `;
 
 // Logic to find and replace the pattern in the `temp` variable
 temp = temp.replace(
-  /component\.find\((\w+)\)\.simulate\('change',\s*([\s\S]*?)\);/g,
-  'screen.getByTestId($1).simulate(\'change\', $2);'
+  /component\.find\((['"]#\w+['"])\)\.at\(\d+\)\.simulate\('blur',\s*([\s\S]*?)\);/g,
+  'fireEvent.blur(screen.getByTestId($1), $2);'
 );
 
 // Output the updated content
