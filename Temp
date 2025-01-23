@@ -1,14 +1,79 @@
-// Sample file content stored in the variable `temp`
-let temp = `
-  component.find('#accno').at(1).simulate('blur', {target:{value: '1111', name: TEXT.SOMETHING}});
-  component.find('#username').at(2).simulate('blur', {target:{value: 'testValue', name: TEXT.OTHER}});
-`;
+it('should handle executor details restoration and update form values', () => {
+  const mockRepresentationDetails = {
+    executorCount: 2,
+    executorDetails: {
+      executor_1: {
+        CS_FirstName1: 'John',
+        CS_LastName1: 'Doe',
+        CS_Email1: 'john.doe@example.com',
+        CS_ConfirmEmail1: 'john.doe@example.com',
+      },
+      executor_2: {
+        CS_FirstName2: 'Jane',
+        CS_LastName2: 'Smith',
+        CS_Email2: 'jane.smith@example.com',
+        CS_ConfirmEmail2: 'jane.smith@example.com',
+      },
+      executor_11: true, // Ensures the `if` condition is satisfied
+    },
+  };
 
-// Logic to find and replace the pattern in the `temp` variable
-temp = temp.replace(
-  /component\.find\((['"]#\w+['"])\)\.at\(\d+\)\.simulate\('blur',\s*([\s\S]*?)\);/g,
-  'fireEvent.blur(screen.getByTestId($1), $2);'
-);
+  const mockFormValues = {
+    executorCount: 0,
+    executorDetails: {},
+  };
 
-// Output the updated content
-console.log(temp);
+  const mockSetAppData = jest.fn();
+
+  const component = mount(
+    <Router history={history}>
+      <ThemeProvider>
+        <AppContextProvider
+          value={{
+            appData: { representationDetails: mockRepresentationDetails },
+            setAppData: mockSetAppData,
+          }}
+        >
+          <DigitalSettlementForm />
+        </AppContextProvider>
+      </ThemeProvider>
+    </Router>
+  );
+
+  // Simulate form update based on mockRepresentationDetails
+  component.find('[data-testid="NEXT_BTN_ID"]').at(0).simulate('click');
+
+  // Expected restored fields
+  const restoredFields = [
+    {
+      firstName: 'John',
+      lastName: 'Doe',
+      emailid: 'john.doe@example.com',
+      confirmemail: 'john.doe@example.com',
+    },
+    {
+      firstName: 'Jane',
+      lastName: 'Smith',
+      emailid: 'jane.smith@example.com',
+      confirmemail: 'jane.smith@example.com',
+    },
+  ];
+
+  // Verify that formValues.executorDetails has been updated correctly
+  restoredFields.forEach((field, index) => {
+    expect(mockSetAppData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        representationDetails: expect.objectContaining({
+          executorDetails: expect.objectContaining({
+            [`executor_${index + 1}`]: {
+              [`CS_FirstName${index + 1}`]: field.firstName,
+              [`CS_LastName${index + 1}`]: field.lastName,
+              [`CS_Email${index + 1}`]: field.emailid,
+              [`CS_ConfirmEmail${index + 1}`]: field.confirmemail,
+            },
+          }),
+        }),
+      })
+    );
+  });
+});
